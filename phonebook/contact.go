@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// Contact represents a contact found in a phone book.
 type Contact struct {
 	Number    string
 	FirstName string
@@ -13,6 +14,7 @@ type Contact struct {
 	Address   string
 }
 
+// Validate checks that each field value is valid.
 func (c Contact) Validate() error {
 	if matched, err := regexp.Match("^\\d{10}$", []byte(c.Number)); err != nil || !matched {
 		return fmt.Errorf("phone number must contain 10 digits")

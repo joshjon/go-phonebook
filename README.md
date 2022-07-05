@@ -33,4 +33,5 @@ Refer to `example.go` for example usage of the phone book.
 ## Implementation Details
 
 The phone book utilises map indexes for each searchable field to dramatically reduce search times to O(1). A trie is
-also used to store phone numbers which allows retrieval and prefix search to be performed at O(n), where 0 < n <= 10.
+also used to store phone numbers with an associated contact. All children of a trie node have a common number prefix,
+which allows fast retrieval of a number (worst case is O(m), where m is the length of the number searched).

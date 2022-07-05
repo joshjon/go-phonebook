@@ -2,12 +2,19 @@ package index
 
 import "github.com/deckarep/golang-set/v2"
 
+// MapIndex uses a map to index records on one or more fields, which makes
+// searching dramatically faster for the specified field(s) at O(1) time complexity.
 type MapIndex[T comparable] struct {
 	id    int
 	index map[string]mapset.Set[T]
+	// A function to specify which fields should be returned from the item for
+	// the index. For multiple fields simply concatenating them will suffice.
+	// For fields that are optional, return a false boolean flag to indicate that
+	// the value is not present, in which it will be skipped.
 	keyFn func(T) (string, bool)
 }
 
+// NewMapIndex returns a new MapIndex.
 func NewMapIndex[T comparable](id int, keyFn func(T) (string, bool)) *MapIndex[T] {
 	return &MapIndex[T]{
 		id:    id,
@@ -16,6 +23,7 @@ func NewMapIndex[T comparable](id int, keyFn func(T) (string, bool)) *MapIndex[T
 	}
 }
 
+// Add adds a new item to the map index.
 func (i *MapIndex[T]) Add(item T) {
 	if key, ok := i.keyFn(item); ok {
 		if items, ok := i.index[key]; ok {
@@ -26,6 +34,7 @@ func (i *MapIndex[T]) Add(item T) {
 	}
 }
 
+// Get returns the item for the specified key.
 func (i *MapIndex[T]) Get(key string) ([]T, bool) {
 	items, ok := i.index[key]
 	if !ok {
@@ -35,6 +44,7 @@ func (i *MapIndex[T]) Get(key string) ([]T, bool) {
 	return items.ToSlice(), true
 }
 
+// Delete removes the specified item from the index.
 func (i *MapIndex[T]) Delete(item T) {
 	if key, ok := i.keyFn(item); ok {
 		if items, ok := i.index[key]; ok {
@@ -46,22 +56,26 @@ func (i *MapIndex[T]) Delete(item T) {
 	}
 }
 
+// Indexes holds multiple indexes to easily perform operations across.
 type Indexes[T comparable] struct {
 	indexes []*MapIndex[T]
 }
 
+// NewIndexes returns a new Indexes that contains the provided indexes.
 func NewIndexes[T comparable](indexes ...*MapIndex[T]) *Indexes[T] {
 	return &Indexes[T]{
 		indexes: indexes,
 	}
 }
 
+// Add adds the item to each index.
 func (i *Indexes[T]) Add(item T) {
 	for _, index := range i.indexes {
 		index.Add(item)
 	}
 }
 
+// Get returns all items from the specified index for the provided key.
 func (i Indexes[T]) Get(id int, key string) ([]T, bool) {
 	for _, index := range i.indexes {
 		if index.id == id {
@@ -71,6 +85,7 @@ func (i Indexes[T]) Get(id int, key string) ([]T, bool) {
 	return nil, false
 }
 
+// Delete removes the specified item from each index.
 func (i Indexes[T]) Delete(item T) {
 	for _, index := range i.indexes {
 		index.Delete(item)

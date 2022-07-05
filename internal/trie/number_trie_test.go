@@ -19,13 +19,13 @@ func TestNumberTrie_Insert(t *testing.T) {
 	require.NoError(t, trie.Insert(insertKey, wantItem))
 
 	node := trie.root.children[0]
-	require.Nil(t, node.item)
+	require.Nil(t, node.value)
 
 	node = node.children[1]
-	require.Nil(t, node.item)
+	require.Nil(t, node.value)
 
 	node = node.children[2]
-	require.Equal(t, wantItem, *node.item)
+	require.Equal(t, wantItem, *node.value)
 }
 
 func TestNumberTrie_Insert_duplicateError(t *testing.T) {
@@ -45,12 +45,12 @@ func TestNumberTrie_Get(t *testing.T) {
 		wantFound bool
 	}{
 		{
-			name:      "item found",
+			name:      "value found",
 			key:       insertKey,
 			wantFound: true,
 		},
 		{
-			name:      "item not found",
+			name:      "value not found",
 			key:       "000",
 			wantFound: false,
 		},
@@ -124,11 +124,11 @@ func TestNumberTrie_Delete(t *testing.T) {
 	trie.Delete("01")
 
 	node := trie.root.children[0]
-	require.Equal(t, wantItem, *node.item)
+	require.Equal(t, wantItem, *node.value)
 
 	node = node.children[1]
-	require.Nil(t, node.item)
+	require.Nil(t, node.value)
 
 	node = node.children[2]
-	require.Equal(t, wantItem, *node.item)
+	require.Equal(t, wantItem, *node.value)
 }
